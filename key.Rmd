@@ -22,7 +22,7 @@ library(ggbeeswarm)
 
 library(gapminder)
 
-#library(sf)
+library(sf)
 ```
 
 ### Read in the lizard data
@@ -121,9 +121,110 @@ ggplot(data = lizards, aes(x = total_length,
 #took out shapes because there was only up to 6
 ```
 
+### Fun with scales
 
 
+```{r}
+ggplot(data = lizards, aes(x = total_length,
+                           y = weight)) +
+  geom_point(aes(color = weight)) +
+  scale_color_gradientn(colors = c("magenta", "cyan4", "darkorchid3", "dodgerblue", "green", "yellow"))
+```
+
+```{r}
+ggplot(data = lizards, aes(x = total_length,
+                           y = weight)) +
+  geom_point(aes(color = weight)) +
+  scale_color_steps(low = "red", high = "black")
+
+ggplot(data = lizards, aes(x = total_length,
+                           y = weight)) +
+  geom_point(aes(color = total_length)) +
+  scale_color_steps2(low = "purple",
+                    mid = "white",
+                    high = "orange",
+                    midpoint = 150,
+                    breaks = c(50, 75, 150, 180, 220, 280))
+
+ggplot(data = lizards, aes(x = total_length,
+                           y = weight)) +
+  geom_point(aes(color = total_length)) +
+  scale_color_stepsn(colors = c("orange", "red", "purple"),
+                     breaks = c(50, 55, 80, 140, 200))
+
+ggplot(data = lizards, aes(x = total_length,
+                           y = weight)) +
+  geom_point(aes(color = total_length)) +
+  scale_color_stepsn(colors = c("orange", "red", "purple"),
+                     breaks = seq(from = 0,
+                                to = 300,
+                                by = 60))
+```
+
+Make a horizontal boxplot with common name on the y-axis, total length on the x-axis, with boxplot fill changing based on the common name
+
+```{r}
+lizards_median <- lizards |> 
+  mutate(common_name = fct_reorder(common_name, total_length, .fun = median))
+
+ggplot(data = lizards, aes(x = total_length,
+                           y = common_name)) +
+  geom_boxplot(aes(fill = common_name))
+
+ggplot(data = lizards_median, aes(y = common_name, x = total_length)) +
+  geom_boxplot(aes(fill = common_name), show.legend = FALSE) +
+  scale_fill_paletteer_d(palette = "ghibli::SpiritedMedium") +
+  theme_minimal()
+```
+
+```{r}
+ggplot(data = lizards, aes(x = total_length,
+                           y = weight)) +
+  geom_point(aes(color = weight)) +
+  theme(panel.grid.major =  element_line(color = "red"),
+        panel.grid.minor.y = element_blank(),
+        axis.title.x = element_text(color = "purple", size = 10),
+        axis.title.y = element_text(color = "green"),
+        text = element_text(size = 18),
+        panel.background = element_rect(color = "purple", fill = "yellow")) +
+  annotate("text", x = 300, y = 50, label = "WOOOO", color = "blue") +
+  geom_vline(xintercept = 250, linetype = "dashed", color = "orange", size = 4)
+```
+
+Repulsive labels with `ggrepel`
+
+```{r}
+wws_lizards <- lizards |> 
+  filter(common_name == "western whiptail",
+         site == "sand")
+
+ggplot(data = wws_lizards, aes(x = total_length,
+                           y = weight)) +
+  geom_point() +
+  geom_text_repel(aes(label = toe_num))
+
+gapminder |> 
+  filter(year == 2002, continent == "Europe") |> 
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() +
+  geom_text_repel(aes(label = country), size = 3)
+
+ggplot(data = lizards, aes(x = total_length,
+                           y = weight)) +
+  geom_point() +
+  gghighlight(toe_num == 250, label_key = toe_num)
+
+ggplot(data = lizards, aes(x = total_length,
+                           y = weight)) +
+  geom_point() +
+  gghighlight(weight > 30, label_key = toe_num)
+```
+
+###Make a map!
+
+```{r}
+jornada_veg <- read_sf(here("data_raw", "spatial_vegetation", "doc.kml"))
 
 
-
+```
 

@@ -225,6 +225,9 @@ ggplot(data = lizards, aes(x = total_length,
 ```{r}
 jornada_veg <- read_sf(here("data_raw", "spatial_vegetation", "doc.kml"))
 
-
+ggplot() + 
+  geom_sf(data = jornada_veg, aes(fill = Name)) + 
+  theme_minimal() +
+  scale_fill_paletteer_d(palette = "ggthemes::manyeys")
 ```
 
